@@ -2,7 +2,8 @@ module.exports = {
     apps: [
         {
             name: "my-app", // Name of your app
-            script: "index.js", // Script to run
+            script: "npm",
+            args: "run prod", // Run the npm command
             instances: 2, // Number of instances (processes)
             exec_mode: "cluster", // Run in cluster mode
             watch: false, // Disable file watching
