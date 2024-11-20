@@ -1,9 +1,10 @@
 const db = require('../../loaders/sqlite');
 
 async function domainVerification(req, res) {
-    let {domains, emails, uniqueId} = req.body;
+    let {domains, emails} = req.body;
+    let {client_id} = req.query;
 
-    if (!domains?.length || !emails?.length || !uniqueId) {
+    if (!domains?.length || !emails?.length || !client_id) {
         return res.status(400).send({error: 'Bad Request'});
     }
 
@@ -17,13 +18,20 @@ async function domainVerification(req, res) {
         for (let domain of domains) {
             let found = findDomains.find(d => d.domain === domain);
             if (!found) {
-                finalInsertDomains.push({domain: domain, email: emails.join(','), requested_by: uniqueId, created_at: new Date().toISOString(), updated_at: new Date().toISOString()});
+                finalInsertDomains.push({
+                    domain: domain,
+                    email: emails.join(','),
+                    requested_by: client_id,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                });
+            } else {
+                await db.update('UPDATE domains SET email = ?, updated_at = ? WHERE domain = ?', [emails.join(','), new Date().toISOString(), domain]);
             }
         }
 
         if (finalInsertDomains.length > 0) {
-            let insertDomains = await db.insertMany('domains', finalInsertDomains);
-            console.log("=>(domainVerification.js:26) insertDomains", insertDomains);
+            await db.insertMany('domains', finalInsertDomains);
         }
         return res.send({message: "Domain verification is successful."});
     } catch (error) {

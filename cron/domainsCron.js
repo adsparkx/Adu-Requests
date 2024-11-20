@@ -1,5 +1,6 @@
 const {find, update} = require("../loaders/sqlite");
-const whois = require("whois-json");
+const whois = require("whois-parsed");
+const {sendEmail} = require("../utils/mail");
 
 async function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -14,11 +15,11 @@ async function processDomainsRecursively(domains, index = 0) {
 
     try {
         // Make the Whois call
-        let whoisData = await whois(domains[index].domain);
+        let whoisData = await whois.lookup(domains[index].domain);
 
-        await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ? WHERE id = ?", [whoisData.registrarRegistrationExpirationDate || null, new Date().toISOString(), whoisData.creationDate, new Date().toISOString(), domains[index].id]);
-        domains[index].expiry = whoisData.registrarRegistrationExpirationDate || domains[index].expiry || null;
-        domains[index].expire_in_days = Math.floor((new Date(whoisData.registrarRegistrationExpirationDate) - new Date()) / 86400000);
+        await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ?, updated_at = ? WHERE id = ?", [whoisData.expirationDate || null, whoisData.updatedDate, whoisData.creationDate, new Date().toISOString(), new Date().toISOString(), domains[index].id]);
+        domains[index].expiry = whoisData.expirationDate || domains[index].expiry || null;
+        domains[index].expire_in_days = Math.floor((new Date(whoisData.expirationDate) - new Date()) / 86400000);
         domains[index].send_email = domains[index].expire_in_days < 30;
 
         // Delay for 5 seconds before the next call
@@ -48,7 +49,7 @@ async function processDomains() {
         if (!finalEmail[domains[i].requested_by]) {
             finalEmail[domains[i].requested_by] = [];
         }
-        if (domains[i].expire_in_days) {
+        if (domains[i].send_email) {
             finalEmail[domains[i].requested_by].push(domains[i]);
         }
     }
@@ -56,19 +57,38 @@ async function processDomains() {
     for (let key in finalEmail) {
         console.log("Final Email => ", key, finalEmail[key]);
 
-        // Send email to the user
-        let emailConfig = {
-            from: "abc@adsparkx.com",
-            to: finalEmail[key][0].email.split(","),
-            subject: "[ALERT] [EXPIRY] Domain Expiry Notification",
-            text: `The following domains are about to expire in 30 days: <br /> ${finalEmail[key].map(d => "" + d.domain + " => " + d.expire_in_days + " days ").join("<br />")}`
+        if (finalEmail[key].length === 0) {
+            continue;
         }
 
-        // Send email
-        console.log("Email Config => ", emailConfig);
+        // Send email to the user
+        let emailConfig = {
+            from: "dilip.kumar@adsparkx.com",
+            to: finalEmail[key][0].email.split(","),
+            subject: "[ALERT] [EXPIRY] Domain Expiry Notification",
+            text: `<html>
+              <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f9f9f9;">
+                <h3 style="color: #333;">Domain Expiration Reminder</h3>
+                <p>The following domains are about to expire:</p>
+                <ul style="list-style-type: none; padding: 0;">
+                ${finalEmail[key].map(e => {
+                    return `<li>${e.domain}: <strong>${e.expire_in_days} days</strong></li>`;
+                }).join('')}  
+                </ul>
+                <p>Please take action to renew your domains if necessary.</p>
+              </body>
+            </html>`,
+        }
+
+
+        await sendEmail({
+            from: emailConfig.from,
+            to: emailConfig.to,
+            subject: emailConfig.subject,
+            text: emailConfig.text,
+        });
     }
 
-    console.log("Final Email => ", finalEmail);
 }
 
 module.exports = {processDomains};
