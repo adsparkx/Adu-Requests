@@ -127,7 +127,7 @@ async function update(query, params = []) {
 }
 
 // Generic function to execute a delete query
-async function remove(query, params = []) {
+async function deleteBy(query, params = []) {
     try {
         await new Promise((resolve, reject) => {
             db.run(query, params, function (err) {
@@ -166,9 +166,8 @@ async function find(query, params = []) {
 // Export the functions
 module.exports = {
     connect,
-    insert,
     update,
-    remove,
+    deleteBy,
     find,
     insertMany,
 };

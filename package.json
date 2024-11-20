@@ -11,11 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "node-cron": "^3.0.3",
     "sqlite3": "^5.1.7",
-    "whois-json": "^2.0.4"
+    "whois-parsed": "^1.0.14"
   }
 }
