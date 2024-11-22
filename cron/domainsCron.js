@@ -19,8 +19,8 @@ async function processDomainsRecursively(domains, index = 0) {
 
         await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ?, updated_at = ? WHERE id = ?", [whoisData.expirationDate || null, whoisData.updatedDate, whoisData.creationDate, new Date().toISOString(), new Date().toISOString(), domains[index].id]);
         domains[index].expiry = whoisData.expirationDate || domains[index].expiry || null;
-        domains[index].expire_in_days = Math.floor((new Date(whoisData.expirationDate) - new Date()) / 86400000);
-        domains[index].send_email = domains[index].expire_in_days < 30;
+        domains[index].expire_in_days = (Math.floor((new Date(whoisData.expirationDate) - new Date()) / 86400000)) || 0;
+        domains[index].send_email = domains[index].expire_in_days < 365;
 
         // Delay for 5 seconds before the next call
         await delay(2000);
@@ -49,13 +49,13 @@ async function processDomains() {
         if (!finalEmail[domains[i].requested_by]) {
             finalEmail[domains[i].requested_by] = [];
         }
-        if (domains[i].send_email) {
+        if (domains[i]?.send_email) {
             finalEmail[domains[i].requested_by].push(domains[i]);
         }
     }
 
     for (let key in finalEmail) {
-        console.log("Final Email => ", key, finalEmail[key]);
+        console.log("Final Email => ", key, finalEmail[key].length);
 
         if (finalEmail[key].length === 0) {
             continue;
