@@ -7,6 +7,7 @@ const {initCron} = require("./cron");
 const {authenticationMiddleware} = require("./middleware/authentication");
 const {domainsList} = require("./controllers/domains/domainsList");
 const {domainDelete} = require("./controllers/domains/domainDelete");
+const {processDomains} = require("./cron/domainsCron");
 
 const app = express();
 
@@ -26,6 +27,10 @@ app.post('/request', authenticationMiddleware, async (req, res) => {
 
 app.get('/domains', authenticationMiddleware, domainsList);
 app.post('/domains', authenticationMiddleware, domainVerification);
+app.get('/domains/cron', authenticationMiddleware, async (req, res) => {
+    processDomains();
+    return res.send('OK');
+});
 app.delete('/domains/:domain_id', authenticationMiddleware, domainDelete);
 
 app.listen(process.env.PORT || 3000, () => {
@@ -34,7 +39,6 @@ app.listen(process.env.PORT || 3000, () => {
 
 if (process.env.pm_id === "0" || process.env.CRON === "true") {
     console.log("CRON Job Initiated ===> ", new Date());
-    // processDomains();
     initCron();
 }
 
