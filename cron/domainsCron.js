@@ -14,6 +14,7 @@ async function processDomainsRecursively(domains, index = 0) {
 
     try {
         // Make the Whois call
+        console.log("Processing domain => ", domains[index].domain, index);
         let whoisData = await whois.lookup(domains[index].domain);
 
         await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ?, updated_at = ? WHERE id = ?", [whoisData.expirationDate || null, whoisData.updatedDate, whoisData.creationDate, new Date().toISOString(), new Date().toISOString(), domains[index].id]);
