@@ -29,8 +29,16 @@ app.post('/request', authenticationMiddleware, async (req, res) => {
 app.get('/domains', authenticationMiddleware, domainsList);
 app.post('/domains', authenticationMiddleware, domainVerification);
 app.get('/domains/cron', authenticationMiddleware, async (req, res) => {
-    processDomains();
-    return res.send('OK');
+    let response = "OK";
+    let {type} = req.query;
+    if (type === "email") {
+        await processEmails();
+    } else if (type === "expiry") {
+        await processDomains();
+    } else {
+        response = "Invalid type";
+    }
+    return res.send(response);
 });
 app.delete('/domains/:domain_id', authenticationMiddleware, domainDelete);
 app.listen(process.env.PORT || 3000, () => {
