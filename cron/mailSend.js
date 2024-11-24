@@ -1,7 +1,7 @@
 const db = require('../loaders/sqlite');
 const {sendEmail} = require("../utils/mail");
 
-const EMAIL_EXPIRY = 365;
+const EMAIL_EXPIRY = 12;
 
 async function processEmails() {
 
