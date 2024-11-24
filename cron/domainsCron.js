@@ -1,6 +1,5 @@
-const {find, update} = require("../loaders/sqlite");
+const {find, update, connect} = require("../loaders/sqlite");
 const whois = require("whois-parsed");
-const {sendEmail} = require("../utils/mail");
 
 async function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,6 +39,5 @@ async function processDomains() {
     await processDomainsRecursively(domains);
     console.log("UPDATE EXPIRY DATE Cron job completed => ", new Date());
 }
-
 
 module.exports = {processDomains};

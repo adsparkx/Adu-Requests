@@ -37,7 +37,6 @@ app.listen(process.env.PORT || 3000, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 });
 
-processEmails();
 if (process.env.pm_id === "0" || process.env.CRON === "true") {
     console.log("CRON Job Initiated ===> ", new Date());
     initCron();
