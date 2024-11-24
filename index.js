@@ -33,7 +33,7 @@ app.get('/domains/cron', authenticationMiddleware, async (req, res) => {
     return res.send('OK');
 });
 app.delete('/domains/:domain_id', authenticationMiddleware, domainDelete);
-app.listen(process.env.PORT || 3000 + (process.env.NODE_APP_INSTANCE || 0) || 3000, () => {
+app.listen(process.env.PORT || 3000, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 });
 
