@@ -38,7 +38,7 @@ async function processDomainsRecursively(domains, index = 0) {
 }
 
 async function processDomains() {
-    let domains = await find(`SELECT * FROM domains  WHERE (expiry IS NULL) OR (expiry < DATE('now', '+15 days'))`);
+    let domains = await find(`SELECT * FROM domains  WHERE (expiry IS NULL) OR (expiry < DATE('now', '+12 days'))`);
 
     console.log("Cron job started => ", domains.length);
     await processDomainsRecursively(domains);
