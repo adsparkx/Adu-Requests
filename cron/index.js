@@ -4,7 +4,7 @@ const {processEmails} = require("./mailSend");
 
 function initCron() {
     cron.schedule('30 7 * * *', processEmails);
-    cron.schedule('0 0 * * SAT', processDomains);
+    cron.schedule('0 21 * * *', processDomains);
 }
 
 module.exports = {initCron};

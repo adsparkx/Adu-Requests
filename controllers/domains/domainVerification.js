@@ -26,7 +26,7 @@ async function domainVerification(req, res) {
                     updated_at: new Date().toISOString()
                 });
             } else {
-                await db.update('UPDATE domains SET email = ?, updated_at = ? WHERE domain = ?', [emails.join(','), new Date().toISOString(), domain]);
+                await db.update('UPDATE domains SET email = ?, updated_at = ?, requested_by = ? WHERE domain = ?', [emails.join(','), new Date().toISOString(), client_id, domain]);
             }
         }
 
