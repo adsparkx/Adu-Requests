@@ -30,7 +30,7 @@ async function processEmails() {
 
         // Send email to the user
         let emailConfig = {
-            from: "dilip.kumar@adsparkx.com",
+            from: "no-reply@adunbox.com",
             to: finalEmail[key][0].email.split(","),
             subject: "[ALERT] [EXPIRY] Domain Expiry Notification",
             text: html(finalEmail[key]),

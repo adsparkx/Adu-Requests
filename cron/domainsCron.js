@@ -21,7 +21,7 @@ async function processDomainsRecursively(domains, index = 0) {
             throw new Error("Invalid domain");
         }
 
-        await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ?, updated_at = ? WHERE id = ?", [whoisData.expirationDate || null, whoisData.updatedDate, whoisData.creationDate, new Date().toISOString(), new Date().toISOString(), domains[index].id]);
+        await update("UPDATE domains SET expiry = ?, last_updated = ?, register_at = ?, cron_updated_at = ?, updated_at = ? WHERE id = ?", [whoisData.expiry || null, whoisData.last_updated, whoisData.register_at, new Date().toISOString(), new Date().toISOString(), domains[index].id]);
 
         // Delay for 5 seconds before the next call
         await delay(2000);
