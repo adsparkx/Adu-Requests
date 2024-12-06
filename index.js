@@ -11,7 +11,6 @@ const {processDomains} = require("./cron/domainsCron");
 const {processEmails} = require("./cron/mailSend");
 
 const app = express();
-
 (async () => {
     if (process.env.DOMAIN_CRON === "true") {
         console.log("Connecting to SQLite Database => ", new Date());
@@ -43,6 +42,10 @@ app.get('/domains/cron', authenticationMiddleware, async (req, res) => {
     }
     return res.send(response);
 });
+app.get('/domains/s1', (req, res) => {
+    console.log("Server 1");
+    res.send("OK_" + process?.env?.pm_id || "" + process?.env?.DOMAIN_CRON || "");
+})
 app.delete('/domains/:domain_id', authenticationMiddleware, domainDelete);
 app.listen(process.env.PORT || 3000, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
