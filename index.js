@@ -13,13 +13,16 @@ const {processEmails} = require("./cron/mailSend");
 const app = express();
 
 (async () => {
-    await connect();
+    if (process.env.DOMAIN_CRON === "true") {
+        console.log("Connecting to SQLite Database => ", new Date());
+        await connect();
+    }
 })();
 
 app.use(express.json());
 
 app.get('/health', (req, res) => {
-    res.send('OK');
+    res.send('OK_' + process?.env?.pm_id || "");
 });
 
 app.post('/request', authenticationMiddleware, async (req, res) => {

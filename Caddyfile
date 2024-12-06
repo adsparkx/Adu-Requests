@@ -1,0 +1,59 @@
+(cors) {
+        @origin header Origin *
+        header @origin {
+                Access-Control-Allow-Origin "*"
+                Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+                Access-Control-Allow-Headers "Content-Type, Authorization"
+                Access-Control-Allow-Credentials true
+        }
+}
+
+(reverse_proxy_headers) {
+        header_down -Access-Control-Allow-Origin
+        header_down -Access-Control-Allow-Methods
+        header_down -Access-Control-Allow-Headers
+        header_down -Access-Control-Allow-Credentials
+        header_down Access-Control-Allow-Origin "*"
+        header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        header_down Access-Control-Allow-Headers "Content-Type, Authorization"
+        header_down Access-Control-Allow-Credentials true
+}
+
+:80, :443 {
+        respond "OK"
+
+        # Enable gzip compression for all routes
+        encode gzip
+
+        # Import the CORS configuration
+        import cors
+
+        # Additional optimizations for all routes
+        header {
+                X-Content-Type-Options nosniff
+                X-Frame-Options DENY
+                Content-Security-Policy "default-src 'self'"
+        }
+
+        # Handle preflight OPTIONS requests globally
+        @preflight method OPTIONS
+        handle @preflight {
+                header Access-Control-Allow-Origin "*"
+                header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+                header Access-Control-Allow-Headers "Content-Type, Authorization, User"
+                header Access-Control-Allow-Credentials true
+                respond "" 204
+        }
+
+        route /domains/* {
+                reverse_proxy localhost:5000 {
+                        import reverse_proxy_headers
+                }
+        }
+
+        route /* {
+                reverse_proxy localhost:3000 {
+                        import reverse_proxy_headers
+                }
+        }
+}
