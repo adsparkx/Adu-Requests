@@ -1,22 +1,21 @@
 module.exports = {
     apps: [
-        {
-            name: "my-app",
-            script: "npm",
-            args: "run prod",
-            watch: false,
-            restart_delay: 5000, // Wait 5 seconds before restarting
-            max_memory_restart: "200M", // Restart if memory usage exceeds 200MB
-            env: {
-                NODE_ENV: "production",
-                PORT: 3000, // Let the app dynamically handle ports (see below)
-            },
-            env_development: {
-                NODE_ENV: "development",
-                PORT: 3000, // Let the app dynamically handle ports (see below)
-            },
-            kill_timeout: 1000 * 60 * 5,
-        },
+        // {
+        //     name: "my-app",
+        //     script: "npm",
+        //     args: "run prod", // Correctly pass arguments
+        //     instances: 4,
+        //     exec_mode: "cluster", // Cluster mode
+        //     watch: false,
+        //     restart_delay: 5000,
+        //     env: {
+        //         NODE_ENV: "production",
+        //     },
+        //     env_development: {
+        //         NODE_ENV: "development",
+        //     },
+        //     kill_timeout: 1000 * 60 * 5,
+        // },
         {
             name: "my-app-5000", // Duplicate app for PORT 5000
             script: "npm",
